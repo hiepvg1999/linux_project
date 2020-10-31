@@ -1,4 +1,4 @@
-Contry	Alpha-2code	Alpha-3code	Numeric
+Country Alpha-2code	Alpha-3code	Numeric
 Afghanistan	AF	AFG	004
 Albania	AL	ALB	008
 Algeria	DZ	DZA	012

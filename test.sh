@@ -18,10 +18,10 @@ safe_exit() {
   exit
 }
 check_dependencies
-while getopts ":a:c:l:s:h:" opt; do
+while getopts ":a:c:l:s:p:h:" opt; do
   case $opt in
     a)
-      if [[ opt -eq "all" ]]; then
+      if [[ $opt -eq "all" ]]; then
         data=$(curl -X GET "https://disease.sh/v3/covid-19/all" -H "accept: application/json")
         cases=$(echo $data |  jq ".cases")
         deaths=$(echo $data | jq ".deaths")
@@ -45,22 +45,22 @@ while getopts ":a:c:l:s:h:" opt; do
       fi
       ;;
     c)
-      data=$(curl -X GET "https://disease.sh/v3/covid-19/countries/$OPTARG?strict=true" -H "accept: application/json")
-      if [[ -z data ]]; then
-        echo "Not found data of $-OPTARG country" >&2
-      else
-        countryflag=$(echo $data | jq ".countryInfo" | jq ".flag")  # country flag
-        flag=$countryflag
-        cases=$(echo $data |  jq ".cases")
-        country=$(echo $data | jq ".country")
-        deaths=$(echo $data | jq ".deaths")
-        active=$(echo $data | jq ".active")
+        data=$(curl -X GET "https://disease.sh/v3/covid-19/countries/$OPTARG?strict=true" -H "accept: application/json")
+        if [[ -z data ]]; then
+          echo "Not found data of $-OPTARG country" >&2
+        else
+          countryflag=$(echo $data | jq ".countryInfo" | jq ".flag")  # country flag
+          flag=$countryflag
+          cases=$(echo $data |  jq ".cases")
+          country=$(echo $data | jq ".country")
+          deaths=$(echo $data | jq ".deaths")
+          active=$(echo $data | jq ".active")
         ### print 
-        echo "Infomation about ${country} is:" >&2
-        echo "Info:${countryflag}" >&2
-        echo -e "\e[1;34m Cases: ${cases} \e[0m" >&2
-        echo -e "\e[4;31m Deaths: ${deaths} \e[0m" >&2
-        echo -e "\e[3;33m Active: ${active} \e[0m" >&2
+          echo "Infomation about ${country} is:" >&2
+          echo "Info:${countryflag}" >&2
+          echo -e "\e[1;34m Cases: ${cases} \e[0m" >&2
+          echo -e "\e[4;31m Deaths: ${deaths} \e[0m" >&2
+          echo -e "\e[3;33m Active: ${active} \e[0m" >&2
       fi
       ;;
     l)
@@ -89,6 +89,30 @@ while getopts ":a:c:l:s:h:" opt; do
       echo "Search result:" >&2
       echo "$data" >&2
     fi
+      ;;
+    p)
+    # sort by keys (cases,deaths,active)
+    if [[ $opt -eq "deaths" ]]; then
+      data=$(curl -X GET "https://disease.sh/v3/covid-19/countries?sort=deaths" -H "accept: application/json")
+    elif [[ $opt -eq "cases" ]]; then
+      data=$(curl -X GET "https://disease.sh/v3/covid-19/countries?sort=cases" -H "accept: application/json")
+    elif [[ $opt -eq "active" ]]; then
+      data=$(curl -X GET "https://disease.sh/v3/covid-19/countries?sort=active" -H "accept: application/json")
+    fi
+    len=$(echo $data | jq length)
+    echo "Number of countries: $len" >&2
+    echo "" | nawk '{printf("========================================================\n");
+      printf("|%20s|%10s|%10s|%10s|\n","country","cases","deaths","active");
+      }'
+    for (( i = 0; i < 5; i++ )); do
+      cases=$(echo $data |  jq -r ".[$i].cases")
+      country=$(echo $data | jq -r ".[$i].country")
+      deaths=$(echo $data | jq -r ".[$i].deaths")
+      active=$(echo $data | jq -r ".[$i].active")
+      echo "${country} ${cases} ${deaths} ${active}" | nawk '{printf("========================================================\n");
+      printf("|%20s|%10s|%10s|%10s|\n",$1,$2,$3,$4);
+      }'
+    done
       ;;
     h)
     ### menu
