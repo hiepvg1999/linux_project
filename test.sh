@@ -3,6 +3,8 @@
 # bash test.sh -c VietNam
 # bash test.sh -l 5
 # bash test.sh -s Viet
+# bash test.sh -p cases // deaths // active (top n country)
+# bash test.sh -h menu
 check_dependencies() {
   if ! [ -x "$(command -v jq)" ]; then
     err 'Error: jq is not installed.\nhttps://stedolan.github.io/jq/' >&2
@@ -71,7 +73,7 @@ while getopts ":a:c:l:s:p:h:" opt; do
     echo "Total of lines: $number_line" >&2
     echo "$2 countries of $input file:" >&2
     ## read line by line
-    if ! [[ "$3" =~ ^[0-9]+$ ]]; then
+    if ! [[ "$3" =~ ^[0-9]+$ ]]; then0
       while IFS= read -r line
       do
       echo "$line"
@@ -163,6 +165,7 @@ while getopts ":a:c:l:s:p:h:" opt; do
       echo -e "\e[1;37m -a --all All data " >&2
       echo -e "\e[1;37m -c --list List of country id code" >&2
       echo -e "\e[1;37m -s --search Search info about specific country" >&2
+      echo -e "\e[1;37m -p --sortbykey Sort by key (cases,deaths,active)" >&2
       safe_exit
     else
       echo "Wrong argument.Please input (menu)"
