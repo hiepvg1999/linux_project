@@ -73,7 +73,7 @@ while getopts ":a:c:l:s:p:h:" opt; do
     echo "Total of lines: $number_line" >&2
     echo "$2 countries of $input file:" >&2
     ## read line by line
-    if ! [[ "$3" =~ ^[0-9]+$ ]]; then0
+    if ! [[ "$3" =~ ^[0-9]+$ ]]; then
       while IFS= read -r line
       do
       echo "$line"
