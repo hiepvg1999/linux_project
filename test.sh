@@ -170,7 +170,7 @@ _________             .__    ._______ ________          _________ .____    .___
       echo -e "\e[1;44m Options\e[0m" >&2
       echo -e "\e[1;37m -c --country Specific country" >&2
       echo -e "\e[1;37m -a --all All data " >&2
-      echo -e "\e[1;37m -c --list List of country id code" >&2
+      echo -e "\e[1;37m -l --list List of country id code" >&2
       echo -e "\e[1;37m -s --search Search info about specific country" >&2
       echo -e "\e[1;37m -p --sortbykey Sort by key (cases,deaths,active)" >&2
       safe_exit
