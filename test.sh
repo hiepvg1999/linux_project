@@ -5,6 +5,7 @@
 # bash test.sh -s Viet
 # bash test.sh -p cases // deaths // active (top n country)
 # bash test.sh -h menu
+
 check_dependencies() {
   if ! [ -x "$(command -v jq)" ]; then
     err 'Error: jq is not installed.\nhttps://stedolan.github.io/jq/' >&2
@@ -15,13 +16,19 @@ check_dependencies() {
     die
   fi
 }
+
 safe_exit() {
   trap - INT TERM EXIT
   exit
 }
+
 check_dependencies
+
 while getopts ":a:c:l:s:p:h:" opt; do
   case $opt in
+
+    #show all information.
+    #Example: -a all
     a)
       if [[ "$2" == "all" ]]; then
         data=$(curl -X GET "https://disease.sh/v3/covid-19/all" -H "accept: application/json")
@@ -35,6 +42,7 @@ while getopts ":a:c:l:s:p:h:" opt; do
         tests=$(echo $data | jq ".tests")
         testsPerOneMillion=$(echo $data | jq ".testsPerOneMillion")
         population=$(echo $data | jq ".population")
+	      echo "================================================================================" >&2
         echo "Infomation all the world is:" >&2
         echo >&2
         echo -e "\e[1;34m Cases: ${cases} \e[0m" >&2
@@ -47,6 +55,9 @@ while getopts ":a:c:l:s:p:h:" opt; do
         safe_exit
       fi
       ;;
+
+    #show by Country.
+    #Example: -c vietnam
     c)
         data=$(curl -X GET "https://disease.sh/v3/covid-19/countries/$2?strict=true" -H "accept: application/json")
         if [[ -z data ]]; then
@@ -58,7 +69,7 @@ while getopts ":a:c:l:s:p:h:" opt; do
           country=$(echo $data | jq ".country")
           deaths=$(echo $data | jq ".deaths")
           active=$(echo $data | jq ".active")
-        ### print 
+        ### print
           echo "Infomation about ${country} is:" >&2
           echo "Info:${countryflag}" >&2
           echo -e "\e[1;34m Cases: ${cases} \e[0m" >&2
@@ -66,6 +77,9 @@ while getopts ":a:c:l:s:p:h:" opt; do
           echo -e "\e[3;33m Active: ${active} \e[0m" >&2
       fi
       ;;
+
+    #list information of countries (country-name, alpha-2-code, alpha-3-code).
+    #Example: -l 5
     l)
     input="countries.txt"
     count=0
@@ -81,9 +95,12 @@ while getopts ":a:c:l:s:p:h:" opt; do
         break
       fi
       count=$((count+1))
-      done < "$input"  
+      done < "$input"
     fi
       ;;
+
+    #Search information of countries.
+    #Example: -s Vi
     s)
     input="countries.txt"
     ### search info about country
@@ -93,6 +110,10 @@ while getopts ":a:c:l:s:p:h:" opt; do
       echo "$data" >&2
     fi
       ;;
+
+
+    #show top 5 countries, sort by key (cases/deaths/active)
+    #Example: -p cases
     p)
     # sort by keys (cases,deaths,active)
     case $2 in
@@ -113,7 +134,7 @@ while getopts ":a:c:l:s:p:h:" opt; do
             printf("|%20s|%10s|%10s|%10s|\n",$1,$2,$3,$4);
             }'
         done
-        break  
+        break
         ;;
       cases)
         data=$(curl -X GET "https://disease.sh/v3/covid-19/countries?sort=$2" -H "accept: application/json")
@@ -153,19 +174,23 @@ while getopts ":a:c:l:s:p:h:" opt; do
         ;;
       *)
         echo "Wrong argument.Please input (cases,deaths,active)"
-        safe_exit    
+        safe_exit
     esac
       ;;
+
+
+    #display menu and option
+    #Example: -h menu
     h)
     ### menu
     if [[ "$2" == "menu" ]]; then
       echo "
-_________             .__    ._______ ________          _________ .____    .___ 
+_________             .__    ._______ ________          _________ .____    .___
 \_   ___ \  _______  _|__| __| _/_   /   __   \         \_   ___ \|    |   |   |
 /    \  \/ /  _ \  \/ /  |/ __ | |   \____    /  ______ /    \  \/|    |   |   |
 \     \___(  <_> )   /|  / /_/ | |   |  /    /  /_____/ \     \___|    |___|   |
  \______  /\____/ \_/ |__\____ | |___| /____/            \______  /_______ \___|
-        \/                    \/                                \/        \/        
+        \/                    \/                                \/        \/
 "
       echo -e "\e[1;44m Options\e[0m" >&2
       echo -e "\e[1;37m -c --country Specific country" >&2
@@ -188,4 +213,5 @@ _________             .__    ._______ ________          _________ .____    .___
       ;;
   esac
 done
+
 safe_exit
