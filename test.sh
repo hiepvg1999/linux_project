@@ -5,6 +5,8 @@
 # bash test.sh -s Viet
 # bash test.sh -p cases // deaths // active (top n country)
 # bash test.sh -h menu
+# thong ke theo cac tieu chi va nhap tham so toi da tu 1-10
+# Chieu dai cua tung thanh: Lay tung ngay / max 
 check_dependencies() {
   if ! [ -x "$(command -v jq)" ]; then
     err 'Error: jq is not installed.\nhttps://stedolan.github.io/jq/' >&2
@@ -48,12 +50,11 @@ while getopts ":a:c:l:s:p:h:" opt; do
       fi
       ;;
     c)
-        data=$(curl -X GET "https://disease.sh/v3/covid-19/countries/$2?strict=true" -H "accept: application/json")
+        data=$(curl -sX GET "https://disease.sh/v3/covid-19/countries/$2?strict=true" -H "accept: application/json")
         if [[ -z data ]]; then
           echo "Not found data of $-OPTARG country" >&2
         else
           countryflag=$(echo $data | jq ".countryInfo" | jq ".flag")  # country flag
-          flag=$countryflag
           cases=$(echo $data |  jq ".cases")
           country=$(echo $data | jq ".country")
           deaths=$(echo $data | jq ".deaths")
@@ -61,6 +62,12 @@ while getopts ":a:c:l:s:p:h:" opt; do
         ### print 
           echo "Infomation about ${country} is:" >&2
           echo "Info:${countryflag}" >&2
+          id=`basename $countryflag | sed 's/"//'`
+          if [[ ! -f ./img/$id ]]; then
+            eval "wget $countryflag -O ./img/$id >/dev/null 2>&1"
+            ./img/img_resize.py ./img/$id
+          fi
+          ./imcat/imcat ./img/$id
           echo -e "\e[1;34m Cases: ${cases} \e[0m" >&2
           echo -e "\e[4;31m Deaths: ${deaths} \e[0m" >&2
           echo -e "\e[3;33m Active: ${active} \e[0m" >&2
