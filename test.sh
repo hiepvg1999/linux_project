@@ -5,6 +5,7 @@
 # bash test.sh -s Viet
 # bash test.sh -p cases // deaths // active (top n country)
 # bash test.sh -h menu
+# bash test.sh -i 704 5  // tham so thu nhat la ma code cua nuoc, tham so thu hai la so ngay
 # thong ke theo cac tieu chi va nhap tham so toi da tu 1-10
 # Chieu dai cua tung thanh: Lay tung ngay / max 
 check_dependencies() {
@@ -22,11 +23,11 @@ safe_exit() {
   exit
 }
 check_dependencies
-while getopts ":a:c:l:s:p:h:" opt; do
+while getopts ":a:c:l:s:p:h:i:" opt; do
   case $opt in
     a)
       if [[ "$2" == "all" ]]; then
-        data=$(curl -X GET "https://disease.sh/v3/covid-19/all" -H "accept: application/json")
+        data=$(curl -sX GET "https://disease.sh/v3/covid-19/all" -H "accept: application/json")
         cases=$(echo $data |  jq ".cases")
         deaths=$(echo $data | jq ".deaths")
         active=$(echo $data | jq ".active")
@@ -100,12 +101,29 @@ while getopts ":a:c:l:s:p:h:" opt; do
       echo "$data" >&2
     fi
       ;;
+    i)
+    data=$(curl -sX GET "https://disease.sh/v3/covid-19/historical/$2?lastdays=$3" -H "accept: application/json")
+    country=$(echo $data | jq ".country")
+    echo "========================================================" >&2
+    echo "Number of cases in ${country} within $3 days:" >&2
+    cases=$(echo $data | jq ".timeline.cases")
+    echo $cases
+    echo "========================================================" >&2
+    echo "Number of deaths in ${country} within $3 days:" >&2
+    cases=$(echo $data | jq ".timeline.deaths")
+    echo $cases
+    echo "========================================================" >&2
+    echo "Number of recovered in ${country} within $3 days:" >&2
+    cases=$(echo $data | jq ".timeline.recovered")
+    echo $cases
+    echo "========================================================" >&2
+      ;;
     p)
     # sort by keys (cases,deaths,active)
     case $2 in
       deaths)
         echo "$2"
-        data=$(curl -X GET "https://disease.sh/v3/covid-19/countries?sort=$2" -H "accept: application/json")
+        data=$(curl -sX GET "https://disease.sh/v3/covid-19/countries?sort=$2" -H "accept: application/json")
         len=$(echo $data | jq length)
         echo "Number of countries: $len" >&2
         echo "" | nawk '{printf("========================================================\n");
@@ -120,10 +138,11 @@ while getopts ":a:c:l:s:p:h:" opt; do
             printf("|%20s|%10s|%10s|%10s|\n",$1,$2,$3,$4);
             }'
         done
+        echo "========================================================" >&2
         break  
         ;;
       cases)
-        data=$(curl -X GET "https://disease.sh/v3/covid-19/countries?sort=$2" -H "accept: application/json")
+        data=$(curl -sX GET "https://disease.sh/v3/covid-19/countries?sort=$2" -H "accept: application/json")
         len=$(echo $data | jq length)
         echo "Number of countries: $len" >&2
         echo "" | nawk '{printf("========================================================\n");
@@ -138,10 +157,11 @@ while getopts ":a:c:l:s:p:h:" opt; do
             printf("|%20s|%10s|%10s|%10s|\n",$1,$2,$3,$4);
             }'
         done
+        echo "========================================================" >&2
         break
         ;;
       active)
-        data=$(curl -X GET "https://disease.sh/v3/covid-19/countries?sort=$2" -H "accept: application/json")
+        data=$(curl -sX GET "https://disease.sh/v3/covid-19/countries?sort=$2" -H "accept: application/json")
         len=$(echo $data | jq length)
         echo "Number of countries: $len" >&2
         echo "" | nawk '{printf("========================================================\n");
@@ -156,6 +176,7 @@ while getopts ":a:c:l:s:p:h:" opt; do
             printf("|%20s|%10s|%10s|%10s|\n",$1,$2,$3,$4);
             }'
         done
+        echo "========================================================" >&2
         break
         ;;
       *)
