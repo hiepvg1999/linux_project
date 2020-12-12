@@ -1,0 +1,52 @@
+#!/bin/bash
+
+echo "
+_________             .__    ._______ ________          _________ .____    .___ 
+\_   ___ \  _______  _|__| __| _/_   /   __   \         \_   ___ \|    |   |   |
+/    \  \/ /  _ \  \/ /  |/ __ | |   \____    /  ______ /    \  \/|    |   |   |
+\     \___(  <_> )   /|  / /_/ | |   |  /    /  /_____/ \     \___|    |___|   |
+ \______  /\____/ \_/ |__\____ | |___| /____/            \______  /_______ \___|
+        \/                    \/                                \/        \/        
+"
+while true; do
+    cat <<END
+
+======= app =======
+    1. Get all data
+    2. Get data in a country
+    3. Show list of country's id
+    4. Search info about specific country
+    5. Sort by key
+    6. Get data in last n day
+    7. Quit
+END
+    read -p 'Enter funcion: ' choice
+
+    case $choice in
+        1) ./test.sh -a all;;
+        2)
+            read -p 'Enter country name or id: ' country
+            ./test.sh -c $country
+            ;;
+        3) 
+            read -p 'Enter limition (default 10): ' limit
+            [[ -n $limit ]] && ./test.sh -l $limit || ./test.sh -l 10
+            ;;
+        4)
+            read -p 'Enter a pattern: ' pattern
+            ./test.sh -s $pattern
+            ;;
+        5)
+            read -p 'Enter key to sort (cases, deaths, active): ' key
+            read -p 'Enter limition: ' limit
+            ./test.sh -p $key $limit
+            ;;
+        6)
+            read -p 'Enter country name or id: ' country
+            read -p 'Enter number of days: ' days
+            [[ -n $days ]] && ./test.sh -w $country $days
+            ;;
+        7) exit 0;;
+        *) exit 0;;
+    esac
+done

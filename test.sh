@@ -23,7 +23,7 @@ safe_exit() {
   exit
 }
 check_dependencies
-while getopts ":a:c:l:s:p:h:i:" opt; do
+while getopts ":a:c:l:s:p:h:i:w:" opt; do
   case $opt in
     a)
       if [[ "$2" == "all" ]]; then
@@ -75,31 +75,22 @@ while getopts ":a:c:l:s:p:h:i:" opt; do
       fi
       ;;
     l)
-    input="countries.txt"
-    count=0
-    number_line=$(wc -l <countries.txt) ## count number lines
-    echo "Total of lines: $number_line" >&2
-    echo "$2 countries of $input file:" >&2
-    ## read line by line
-    if ! [[ "$3" =~ ^[0-9]+$ ]]; then
-      while IFS= read -r line
-      do
-      echo "$line"
-      if [[ $count -eq $2 ]]; then
-        break
-      fi
-      count=$((count+1))
-      done < "$input"  
-    fi
-      ;;
+    cat countries.txt | ./pylist/tb.py $(($2 + 1));;
     s)
     input="countries.txt"
     ### search info about country
-    data=$(grep $2 $input)
     if [[ -z $3 ]]; then
-      echo "Search result:" >&2
-      echo "$data" >&2
+      echo "Search result:"
+      grep -i $2 $input | ./pylist/tb.py
     fi
+      ;;
+    w)
+      day=`date -d "$3 day ago" +%D`
+      before=`curl -sX GET "https://disease.sh/v3/covid-19/historical/$OPTARG?lastdays=$3" -H "accept: application/json" |
+            jq ".timeline.cases[\"$day\"]"`
+      today=`curl -sX GET "https://disease.sh/v3/covid-19/countries/$OPTARG?strict=true" -H "accept: application/json" |
+            jq ".cases"`
+      echo $((today - before))
       ;;
     i)
     data=$(curl -sX GET "https://disease.sh/v3/covid-19/historical/$2?lastdays=$3" -H "accept: application/json")
@@ -129,7 +120,7 @@ while getopts ":a:c:l:s:p:h:i:" opt; do
         echo "" | nawk '{printf("========================================================\n");
           printf("|%20s|%10s|%10s|%10s|\n","country","cases","deaths","active");
           }'
-        for (( i = 0; i < 5; i++ )); do
+        for (( i = 0; i < $3; i++ )); do
           cases=$(echo $data |  jq -r ".[$i].cases")
           country=$(echo $data | jq -r ".[$i].country")
           deaths=$(echo $data | jq -r ".[$i].deaths")
@@ -139,7 +130,7 @@ while getopts ":a:c:l:s:p:h:i:" opt; do
             }'
         done
         echo "========================================================" >&2
-        break  
+        break 
         ;;
       cases)
         data=$(curl -sX GET "https://disease.sh/v3/covid-19/countries?sort=$2" -H "accept: application/json")
@@ -148,7 +139,7 @@ while getopts ":a:c:l:s:p:h:i:" opt; do
         echo "" | nawk '{printf("========================================================\n");
           printf("|%20s|%10s|%10s|%10s|\n","country","cases","deaths","active");
           }'
-        for (( i = 0; i < 5; i++ )); do
+        for (( i = 0; i < $3; i++ )); do
           cases=$(echo $data |  jq -r ".[$i].cases")
           country=$(echo $data | jq -r ".[$i].country")
           deaths=$(echo $data | jq -r ".[$i].deaths")
@@ -167,7 +158,7 @@ while getopts ":a:c:l:s:p:h:i:" opt; do
         echo "" | nawk '{printf("========================================================\n");
           printf("|%20s|%10s|%10s|%10s|\n","country","cases","deaths","active");
           }'
-        for (( i = 0; i < 5; i++ )); do
+        for (( i = 0; i < $3; i++ )); do
           cases=$(echo $data |  jq -r ".[$i].cases")
           country=$(echo $data | jq -r ".[$i].country")
           deaths=$(echo $data | jq -r ".[$i].deaths")
