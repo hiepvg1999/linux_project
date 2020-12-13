@@ -28,6 +28,7 @@ make
 
 ```
 virtualenv prj_env
+source prj_env/bin/activate
 pip install -r requirments.txt #install package for project
 ```
 4. Run project
