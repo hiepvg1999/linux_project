@@ -1,0 +1,60 @@
+#!/bin/bash
+
+echo "
+_________             .__    .___        ____ ________
+\_   ___ \  _______  _|__| __| _/       /_   /   __   |
+/    \  \/ /  _ \  \/ /  |/ __ |   ____  |   \____    /
+\     \___(  <_> )   /|  / /_/ |  /___/  |   |  /    /
+ \______  /\____/ \_/ |__\____ |         |___| /____/
+        \/                    \/
+"
+while true; do
+    cat <<END
+
+======================= Welcome =========================
+    1. Get information about Covid-19 in all the world
+    2. Get information about Covid-19 in a country
+    3. Show list of country's id
+    4. Search information about specific country
+    5. Sort by key (case, death, active)
+    6. Get information in last n day
+    7. Get information in n nearest day
+    8. Quit
+=========================================================
+END
+    read -p 'Enter funcion: ' choice
+
+    case $choice in
+        1) ./main.sh -a all;;
+        2)
+            read -p 'Enter country name or id: ' country
+            ./main.sh -c $country
+            ;;
+        3)
+            read -p 'Enter limition (default 10): ' limit
+            [[ -n $limit ]] && ./main.sh -l $limit || ./main.sh -l 10
+            ;;
+        4)
+            read -p 'Enter a pattern: ' pattern
+            ./main.sh -s $pattern
+            ;;
+        5)
+            read -p 'Enter key to sort (cases, deaths, active): ' key
+            read -p 'Enter limition: ' limit
+            ./main.sh -p $key $limit
+            ;;
+        6)
+            read -p 'Enter country name or id: ' country
+            read -p 'Enter number of days: ' days
+            [[ -n $days ]] && ./main.sh -w $country $days
+            ;;
+        7)
+            read -p 'Enter country name or id: ' country
+            read -p 'Enter number of days: ' days
+            [[ -n $days ]] && ./main.sh -i $country $days
+            ;;
+
+        8) exit 0;;
+        *) exit 0;;
+    esac
+done
