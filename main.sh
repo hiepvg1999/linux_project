@@ -145,7 +145,7 @@ while getopts ":a:c:l:s:p:h:i:w:" opt; do
 
     echo -e "\e[1;34m           ${country} in $3 days nearest graph: \e[0m" >&2
     python ./graph/create_data_file.py
-    ~/anaconda3/bin/termgraph ./graph/data.txt --color {magenta,red,blue}
+    ./prj_env/bin/termgraph ./graph/data.txt --color {magenta,red,blue}
     echo "========================================================" >&2
       ;;
 
