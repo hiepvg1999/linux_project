@@ -27,7 +27,9 @@ make
 3. Create python virtual enviroment for project
 
 ```
+sudo apt install python3-virtualenv
 virtualenv prj_env
+source prj_env/bin/activate
 pip install -r requirments.txt #install package for project
 ```
 4. Run project
