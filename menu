@@ -28,11 +28,18 @@ END
         1) ./main.sh -a all;;
         2)
             read -p 'Enter country name or id: ' country
-            ./main.sh -c $country
+            d=$(./pylist/check.py $country)
+            if [[ $d = "ok" ]]
+            then
+                ./main.sh -c $country
+            else
+                echo -e "\e[1;31m Error:Invaild country name or id \e[0m" >&2
+            fi
+
             ;;
         3)
             read -p 'Enter limition (default 10): ' limit
-            [[ -n $limit ]] && ./main.sh -l $limit || ./main.sh -l 10
+            [[ -n $limit ]] && [[ $limit -gt 0 ]] && ./main.sh -l $limit || ./main.sh -l 10
             ;;
         4)
             read -p 'Enter a pattern: ' pattern
@@ -40,18 +47,37 @@ END
             ;;
         5)
             read -p 'Enter key to sort (cases, deaths, active): ' key
-            read -p 'Enter limition: ' limit
-            ./main.sh -p $key $limit
+            read -p 'Enter limition(default 5): ' limit
+            if [[ $key != "cases" ]] && [[ $key != "deaths" ]] && [[ $key != "active" ]]
+            then
+                echo -e "\e[1;31m Error:Invaild key \e[0m" >&2
+            else
+                [[ -n $limit ]] && [[ $limit -gt 0 ]] && ./main.sh -p $key $limit || ./main.sh -p $key 5
+            fi
             ;;
         6)
             read -p 'Enter country name or id: ' country
             read -p 'Enter number of days: ' days
-            [[ -n $days ]] && ./main.sh -w $country $days
+            d=$(./pylist/check.py $country)
+            if [[ $d = "ok" ]]
+            then
+                [[ -n $days ]] && ./main.sh -w $country $days
+            else
+                echo -e "\e[1;31m Error:Invaild country name or id \e[0m" >&2
+            fi
+
             ;;
         7)
             read -p 'Enter country name or id: ' country
             read -p 'Enter number of days: ' days
-            [[ -n $days ]] && ./main.sh -i $country $days
+            d=$(./pylist/check.py $country)
+            if [[ $d = "ok" ]]
+            then
+                [[ -n $days ]] && ./main.sh -i $country $days
+            else
+                echo -e "\e[1;31m Error:Invaild country name or id \e[0m" >&2
+            fi
+
             ;;
 
         8) exit 0;;
