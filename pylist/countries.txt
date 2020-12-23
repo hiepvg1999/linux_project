@@ -239,7 +239,7 @@ Uruguay	UY	URY	858
 Uzbekistan	UZ	UZB	860
 Vanuatu	VU	VUT	548
 Venezuela (Bolivarian Republic of)	VE	VEN	862
-Viet Nam	VN	VNM	704
+VietNam	VN	VNM	704
 Virgin Islands (British)	VG	VGB	092
 Virgin Islands (U.S.)	VI	VIR	850
 Wallis and Futuna	WF	WLF	876

@@ -8,6 +8,6 @@ if len(sys.argv) < 1:
     print("error")
 for r in array:
     for c in r:
-        if (sys.argv[1] == c):
+        if (sys.argv[1].lower() == c.lower()):
             print("ok")
 f.close()
